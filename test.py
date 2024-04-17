@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import filedialog
 
 class JdRCampaignManager:
     def __init__(self, master):
@@ -9,19 +10,46 @@ class JdRCampaignManager:
         self.label = tk.Label(master, text="Bienvenue dans le Gestionnaire de Campagne de JdR !")
         self.label.pack()
 
-        self.load_campaign_button = tk.Button(master, text="Charger Campagne", command=self.load_campaign)
-        self.load_campaign_button.pack()
+        # Menu
+        self.menu_bar = tk.Menu(master)
+        master.config(menu=self.menu_bar)
 
-        self.create_campaign_button = tk.Button(master, text="Créer Campagne", command=self.create_campaign)
-        self.create_campaign_button.pack()
+        # Menu Fichier
+        self.file_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_bar.add_cascade(label="Fichier", menu=self.file_menu)
+        self.file_menu.add_command(label="Charger Campagne", command=self.load_campaign)
+        self.file_menu.add_command(label="Enregistrer Campagne", command=self.save_campaign)
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Quitter", command=master.quit)
+
+        # Menu Gérer
+        self.manage_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_bar.add_cascade(label="Gérer", menu=self.manage_menu)
+        self.manage_menu.add_command(label="Personnages", command=self.switch_to_characters_page)
+        self.manage_menu.add_command(label="Scénarios", command=self.switch_to_scenarios_page)
+        self.manage_menu.add_command(label="Objets", command=self.switch_to_items_page)
 
     def load_campaign(self):
-        # Mettez ici le code pour charger une campagne existante
-        messagebox.showinfo("Charger Campagne", "Fonctionnalité à implémenter")
+        file_path = filedialog.askopenfilename(title="Charger Campagne", filetypes=[("Fichiers de Campagne", "*.json")])
+        if file_path:
+            messagebox.showinfo("Charger Campagne", f"Chargement depuis {file_path}")
 
-    def create_campaign(self):
-        # Mettez ici le code pour créer une nouvelle campagne
-        messagebox.showinfo("Créer Campagne", "Fonctionnalité à implémenter")
+    def save_campaign(self):
+        file_path = filedialog.asksaveasfilename(title="Enregistrer Campagne", filetypes=[("Fichiers de Campagne", "*.json")])
+        if file_path:
+            messagebox.showinfo("Enregistrer Campagne", f"Enregistrement vers {file_path}")
+
+    def switch_to_characters_page(self):
+        characters_window = tk.Toplevel(self.master)
+        characters_page = CharactersPage(characters_window)
+
+    def switch_to_scenarios_page(self):
+        scenarios_window = tk.Toplevel(self.master)
+        scenarios_page = ScenariosPage(scenarios_window)
+
+    def switch_to_items_page(self):
+        items_window = tk.Toplevel(self.master)
+        items_page = ItemsPage(items_window)
 
 class CharactersPage:
     def __init__(self, master):
@@ -65,29 +93,6 @@ class ItemsPage:
     def add_item(self):
         messagebox.showinfo("Ajouter Objet", "Fonctionnalité à implémenter")
 
-def switch_to_characters_page():
-    characters_window = tk.Toplevel(root)
-    characters_page = CharactersPage(characters_window)
-
-def switch_to_scenarios_page():
-    scenarios_window = tk.Toplevel(root)
-    scenarios_page = ScenariosPage(scenarios_window)
-
-def switch_to_items_page():
-    items_window = tk.Toplevel(root)
-    items_page = ItemsPage(items_window)
-
 root = tk.Tk()
 campaign_manager = JdRCampaignManager(root)
-
-characters_button = tk.Button(root, text="Personnages", command=switch_to_characters_page)
-characters_button.pack()
-
-scenarios_button = tk.Button(root, text="Scénarios", command=switch_to_scenarios_page)
-scenarios_button.pack()
-
-items_button = tk.Button(root, text="Objets", command=switch_to_items_page)
-items_button.pack()
-
 root.mainloop()
-
