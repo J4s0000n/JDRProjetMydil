@@ -15,4 +15,3 @@ while running:
             running = False
             pygame.quit()
             print("Fermer")
-prout
