@@ -17,6 +17,7 @@ class JdRCampaignManager:
     def __init__(self, master):
         self.master = master
         master.title("Gestionnaire de Campagne de JdR")
+        master.geometry("500x500")
 
         self.label = tk.Label(master, text="Bienvenue dans le Gestionnaire de Campagne de JdR !")
         self.label.pack()
@@ -39,6 +40,7 @@ class CharactersPage:
     def __init__(self, master):
         self.master = master
         master.title("Gérer les Personnages")
+        master.geometry("500x500")
 
         self.tabControl = ttk.Notebook(master)
         self.tabControl.pack(expand=1, fill="both")
@@ -158,6 +160,7 @@ class ScenariosPage:
     def __init__(self, master):
         self.master = master
         master.title("Gérer les Scénarios")
+        master.geometry("500x500")
 
         self.label = tk.Label(master, text="Page de Gestion des Scénarios")
         self.label.pack()
@@ -172,6 +175,7 @@ class ItemsPage:
     def __init__(self, master):
         self.master = master
         master.title("Gérer les Objets")
+        master.geometry("500x500")
 
         self.label = tk.Label(master, text="Page de Gestion des Objets")
         self.label.pack()
@@ -186,6 +190,7 @@ class RollDicePage:
     def __init__(self, master):
         self.master = master
         master.title("Lancer des Dés")
+        master.geometry("500x500")
 
         self.label = tk.Label(master, text="Page de Lancer des Dés")
         self.label.pack()
@@ -214,6 +219,10 @@ class RollDicePage:
     def roll_d20(self):
         random_number = random.randint(1, 20)
         messagebox.showinfo("Lancer d20", f"Résultat: {random_number}")
+        if random_number == 20:
+            messagebox.showinfo("Lancer d20", "Coup critique !")
+        elif random_number == 1:
+            messagebox.showinfo("Lancer d20", "Échec critique !")
 
     def roll_d6(self):
         random_number = random.randint(1, 6)
