@@ -12,6 +12,13 @@ c.execute('''CREATE TABLE IF NOT EXISTS characters
              (id INTEGER PRIMARY KEY, firstname TEXT, force INTEGER, agilite INTEGER, intelligence INTEGER,
               dexterite INTEGER, constitution INTEGER, sagesse INTEGER, charisme INTEGER)''')
 
+# Étape 1 : Création de la table de l'inventaire
+c.execute('''CREATE TABLE IF NOT EXISTS inventory
+             (id INTEGER PRIMARY KEY, character_id INTEGER,
+              item_name TEXT, quantity INTEGER DEFAULT 1,
+              FOREIGN KEY(character_id) REFERENCES characters(id))''')
+
+
 conn.commit()
 
 class JdRCampaignManager:
@@ -194,6 +201,11 @@ class CharactersPage:
         for character in characters:
             self.modify_characters_listbox.insert(tk.END, character[0])
 
+    def get_character_names(self):
+        c.execute("SELECT firstname FROM characters")
+        characters = c.fetchall()
+        return [character[0] for character in characters]
+
 
 class ScenariosPage:
     def __init__(self, master):
@@ -210,20 +222,100 @@ class ScenariosPage:
     def add_scenario(self):
         messagebox.showinfo("Ajouter Scénario", "Fonctionnalité à implémenter")
 
-class ItemsPage:
+class ItemPage:
     def __init__(self, master):
         self.master = master
-        master.title("Gérer les Objets")
-        master.geometry("500x500")
+        self.selected_character = tk.StringVar()
 
-        self.label = tk.Label(master, text="Page de Gestion des Objets")
-        self.label.pack()
+        # Widgets pour l'ajout et la suppression d'objets
+        self.character_dropdown = ttk.Combobox(master, textvariable=self.selected_character)
+        self.character_dropdown.pack()
 
-        self.add_item_button = tk.Button(master, text="Ajouter Objet", command=self.add_item)
+        self.item_entry = tk.Entry(master)
+        self.item_entry.pack()
+
+        self.add_item_button = tk.Button(master, text="Ajouter Objet", command=self.add_item_to_character)
         self.add_item_button.pack()
 
-    def add_item(self):
-        messagebox.showinfo("Ajouter Objet", "Fonctionnalité à implémenter")
+        self.remove_item_button = tk.Button(master, text="Supprimer Objet", command=self.remove_item_from_character)
+        self.remove_item_button.pack()
+
+        # Charger les noms des personnages dans le menu déroulant
+        characters_page = CharactersPage(master)
+        character_names = characters_page.get_character_names()
+        self.character_dropdown['values'] = character_names
+
+    def add_item_to_character(self):
+        selected_character = self.selected_character.get()
+        selected_item = self.item_entry.get()
+
+        if selected_character and selected_item:
+            character_firstname = selected_character.split()[0]
+
+            # Récupérer l'ID du personnage à partir de la base de données
+            c.execute("SELECT id FROM characters WHERE firstname=?", (character_firstname,))
+            character_row = c.fetchone()
+
+            if character_row:
+                character_id = character_row[0]
+
+                # Vérifier si l'objet existe déjà dans l'inventaire du personnage
+                c.execute("SELECT id, quantity FROM inventory WHERE character_id=? AND item_name=?",
+                          (character_id, selected_item))
+                item_row = c.fetchone()
+
+                if item_row:
+                    # Objet déjà présent, incrémenter la quantité
+                    item_id, quantity = item_row
+                    c.execute("UPDATE inventory SET quantity=? WHERE id=?", (quantity + 1, item_id))
+                else:
+                    # Nouvel objet, l'ajouter à l'inventaire
+                    c.execute("INSERT INTO inventory (character_id, item_name) VALUES (?, ?)",
+                              (character_id, selected_item))
+
+                conn.commit()
+                messagebox.showinfo("Ajouter Objet", "Objet ajouté à l'inventaire du personnage avec succès.")
+            else:
+                messagebox.showwarning("Ajouter Objet", "Personnage introuvable dans la base de données.")
+        else:
+            messagebox.showwarning("Ajouter Objet", "Veuillez sélectionner un personnage et entrer le nom de l'objet.")
+
+    def remove_item_from_character(self):
+        selected_character = self.selected_character.get()
+        selected_item = self.item_entry.get()
+
+        if selected_character and selected_item:
+            character_firstname = selected_character.split()[0]
+
+            # Récupérer l'ID du personnage à partir de la base de données
+            c.execute("SELECT id FROM characters WHERE firstname=?", (character_firstname,))
+            character_row = c.fetchone()
+
+            if character_row:
+                character_id = character_row[0]
+
+                # Vérifier si l'objet existe dans l'inventaire du personnage
+                c.execute("SELECT id, quantity FROM inventory WHERE character_id=? AND item_name=?",
+                          (character_id, selected_item))
+                item_row = c.fetchone()
+
+                if item_row:
+                    item_id, quantity = item_row
+                    if quantity > 1:
+                        # Plusieurs exemplaires, décrémenter la quantité
+                        c.execute("UPDATE inventory SET quantity=? WHERE id=?", (quantity - 1, item_id))
+                    else:
+                        # Un seul exemplaire, supprimer l'objet de l'inventaire
+                        c.execute("DELETE FROM inventory WHERE id=?", (item_id,))
+
+                    conn.commit()
+                    messagebox.showinfo("Supprimer Objet", "Objet supprimé de l'inventaire du personnage avec succès.")
+                else:
+                    messagebox.showwarning("Supprimer Objet", "Objet non trouvé dans l'inventaire du personnage.")
+            else:
+                messagebox.showwarning("Supprimer Objet", "Personnage introuvable dans la base de données.")
+        else:
+            messagebox.showwarning("Supprimer Objet", "Veuillez sélectionner un personnage et entrer le nom de l'objet.")
 
 class RollDicePage:
     def __init__(self, master):
@@ -298,7 +390,7 @@ def switch_to_scenarios_page():
 
 def switch_to_items_page():
     items_window = tk.Toplevel(root)
-    items_page = ItemsPage(items_window)
+    items_page = ItemPage(items_window)
 
 def switch_to_roll_dice_page():
     roll_dice_window = tk.Toplevel(root)
