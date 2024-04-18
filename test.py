@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import sqlite3
+import random
 
 # Connexion à la base de données SQLite
 conn = sqlite3.connect('jdr_campaign.db')
@@ -181,6 +182,64 @@ class ItemsPage:
     def add_item(self):
         messagebox.showinfo("Ajouter Objet", "Fonctionnalité à implémenter")
 
+class RollDicePage:
+    def __init__(self, master):
+        self.master = master
+        master.title("Lancer des Dés")
+
+        self.label = tk.Label(master, text="Page de Lancer des Dés")
+        self.label.pack()
+
+        self.roll_d20_button = tk.Button(master, text="Lancer d20", command=self.roll_d20)
+        self.roll_d20_button.pack()
+
+        self.roll_d6_button = tk.Button(master, text="Lancer d6", command=self.roll_d6)
+        self.roll_d6_button.pack()
+
+        self.roll_d12_button = tk.Button(master, text="Lancer d12", command=self.roll_d12)
+        self.roll_d12_button.pack()
+
+        self.roll_d100_button = tk.Button(master, text="Lancer d100", command=self.roll_d100)
+        self.roll_d100_button.pack()
+
+        self.roll_d8_button = tk.Button(master, text="Lancer d8", command=self.roll_d8)
+        self.roll_d8_button.pack()
+
+        self.roll_d10_button = tk.Button(master, text="Lancer d10", command=self.roll_d10)
+        self.roll_d10_button.pack()
+
+        self.roll_d4_button = tk.Button(master, text="Lancer d4", command=self.roll_d4)
+        self.roll_d4_button.pack()
+
+    def roll_d20(self):
+        random_number = random.randint(1, 20)
+        messagebox.showinfo("Lancer d20", f"Résultat: {random_number}")
+
+    def roll_d6(self):
+        random_number = random.randint(1, 6)
+        messagebox.showinfo("Lancer d6", f"Résultat: {random_number}")
+
+    def roll_d12(self):
+        random_number = random.randint(1, 12)
+        messagebox.showinfo("Lancer d12", f"Résultat: {random_number}")
+
+    def roll_d100(self):
+        random_number = random.randint(1, 100)
+        messagebox.showinfo("Lancer d100", f"Résultat: {random_number}")
+
+    def roll_d8(self):
+        random_number = random.randint(1, 8)
+        messagebox.showinfo("Lancer d8", f"Résultat: {random_number}")
+
+    def roll_d10(self):
+        random_number = random.randint(1, 10)
+        messagebox.showinfo("Lancer d10", f"Résultat: {random_number}")
+
+    def roll_d4(self):
+        random_number = random.randint(1, 4)
+        messagebox.showinfo("Lancer d4", f"Résultat: {random_number}")
+
+
 def switch_to_characters_page():
     characters_window = tk.Toplevel(root)
     characters_page = CharactersPage(characters_window)
@@ -193,6 +252,10 @@ def switch_to_items_page():
     items_window = tk.Toplevel(root)
     items_page = ItemsPage(items_window)
 
+def switch_to_roll_dice_page():
+    roll_dice_window = tk.Toplevel(root)
+    roll_dice_page = RollDicePage(roll_dice_window)
+
 root = tk.Tk()
 campaign_manager = JdRCampaignManager(root)
 
@@ -204,5 +267,8 @@ scenarios_button.pack()
 
 items_button = tk.Button(root, text="Objets", command=switch_to_items_page)
 items_button.pack()
+
+roll_dice_button = tk.Button(root, text="Lancer des Dés", command=switch_to_roll_dice_page)
+roll_dice_button.pack()
 
 root.mainloop()
