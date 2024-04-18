@@ -8,7 +8,8 @@ c = conn.cursor()
 
 # Création de la table des personnages
 c.execute('''CREATE TABLE IF NOT EXISTS characters
-             (id INTEGER PRIMARY KEY, name TEXT, firstname TEXT, force INTEGER, agility INTEGER, intelligence INTEGER)''')
+             (id INTEGER PRIMARY KEY, firstname TEXT, force INTEGER, agilite INTEGER, intelligence INTEGER,
+              dexterite INTEGER, constitution INTEGER, sagesse INTEGER, charisme INTEGER)''')
 
 conn.commit()
 
@@ -48,25 +49,48 @@ class CharactersPage:
         self.add_character_frame = tk.Frame(self.add_character_tab)
         self.add_character_frame.pack(padx=10, pady=10)
 
-        # Ajout des champs pour ajouter un personnage
-        self.add_name_label = tk.Label(self.add_character_frame, text="Nom:")
-        self.add_name_label.grid(row=0, column=0, sticky="e")
-        self.add_name_entry = tk.Entry(self.add_character_frame)
-        self.add_name_entry.grid(row=0, column=1)
-
         self.add_firstname_label = tk.Label(self.add_character_frame, text="Prénom:")
         self.add_firstname_label.grid(row=1, column=0, sticky="e")
         self.add_firstname_entry = tk.Entry(self.add_character_frame)
         self.add_firstname_entry.grid(row=1, column=1)
 
-        self.add_stats_label = tk.Label(self.add_character_frame, text="Stats:")
-        self.add_stats_label.grid(row=2, column=0, sticky="e")
-        self.add_stats_entry = tk.Entry(self.add_character_frame)
-        self.add_stats_entry.grid(row=2, column=1)
+        self.add_force_label = tk.Label(self.add_character_frame, text="Force:")
+        self.add_force_label.grid(row=2, column=0, sticky="e")
+        self.add_force_entry = tk.Entry(self.add_character_frame)
+        self.add_force_entry.grid(row=2, column=1)
+
+        self.add_agilite_label = tk.Label(self.add_character_frame, text="Agilité:")
+        self.add_agilite_label.grid(row=3, column=0, sticky="e")
+        self.add_agilite_entry = tk.Entry(self.add_character_frame)
+        self.add_agilite_entry.grid(row=3, column=1)
+
+        self.add_intelligence_label = tk.Label(self.add_character_frame, text="Intelligence:")
+        self.add_intelligence_label.grid(row=4, column=0, sticky="e")
+        self.add_intelligence_entry = tk.Entry(self.add_character_frame)
+        self.add_intelligence_entry.grid(row=4, column=1)
+
+        self.add_dexterite_label = tk.Label(self.add_character_frame, text="Dextérité:")
+        self.add_dexterite_label.grid(row=5, column=0, sticky="e")
+        self.add_dexterite_entry = tk.Entry(self.add_character_frame)
+        self.add_dexterite_entry.grid(row=5, column=1)
+
+        self.add_constitution_label = tk.Label(self.add_character_frame, text="Constitution:")
+        self.add_constitution_label.grid(row=6, column=0, sticky="e")
+        self.add_constitution_entry = tk.Entry(self.add_character_frame)
+        self.add_constitution_entry.grid(row=6, column=1)
+
+        self.add_sagesse_label = tk.Label(self.add_character_frame, text="Sagesse:")
+        self.add_sagesse_label.grid(row=7, column=0, sticky="e")
+        self.add_sagesse_entry = tk.Entry(self.add_character_frame)
+        self.add_sagesse_entry.grid(row=7, column=1)
+
+        self.add_charisme_label = tk.Label(self.add_character_frame, text="Charisme:")
+        self.add_charisme_label.grid(row=8, column=0, sticky="e")
+        self.add_charisme_entry = tk.Entry(self.add_character_frame)
+        self.add_charisme_entry.grid(row=8, column=1)
 
         self.add_character_button = tk.Button(self.add_character_frame, text="Ajouter", command=self.add_character)
-        self.add_character_button.grid(row=3, columnspan=2)
-
+        self.add_character_button.grid(row=9, columnspan=2)
         # Onglet "Modifier Personnage"
         self.modify_character_tab = tk.Frame(self.tabControl)
         self.tabControl.add(self.modify_character_tab, text="Modifier Personnage")
@@ -81,7 +105,7 @@ class CharactersPage:
 
         self.stats_label = tk.Label(self.modify_character_frame, text="Statistique à modifier:")
         self.stats_label.grid(row=1, column=0, sticky="e")
-        self.stats_options = ["Force", "Agilité", "Intelligence"]  # Options de la combobox
+        self.stats_options = ["Force", "Agilité", "Intelligence", "Dexterité", "Constitution", "Sagesse", "Charisme"]  # Options de la combobox
         self.stats_combobox = ttk.Combobox(self.modify_character_frame, values=self.stats_options)
         self.stats_combobox.grid(row=1, column=1)
 
@@ -99,25 +123,36 @@ class CharactersPage:
         self.list_characters_frame = tk.Frame(self.list_characters_tab)
         self.list_characters_frame.pack(padx=10, pady=10)
 
-        # Liste des personnages
+        # Liste des personnages avec une taille de fenêtre plus grande
         self.list_characters_label = tk.Label(self.list_characters_frame, text="Liste des Personnages:")
         self.list_characters_label.pack()
-        self.list_characters_listbox = tk.Listbox(self.list_characters_frame)
-        self.list_characters_listbox.pack()
+
+        # Augmentation de la largeur de la Listbox pour plus d'espace horizontal
+        self.list_characters_listbox = tk.Listbox(self.list_characters_frame,
+                                                  width=100)  # Ajustez la largeur selon vos besoins
+        self.list_characters_listbox.pack(fill=tk.BOTH,
+                                          expand=True)  # Remplissage et extension pour occuper tout l'espace disponible
+
 
         # Charger les personnages
         self.load_characters()
         self.load_characters_for_modification()
 
     def add_character(self):
-        name = self.add_name_entry.get()
         firstname = self.add_firstname_entry.get()
-        stats = self.add_stats_entry.get()
+        force = self.add_force_entry.get()
+        agilite = self.add_agilite_entry.get()
+        intelligence = self.add_intelligence_entry.get()
+        dexterite = self.add_dexterite_entry.get()
+        constitution = self.add_constitution_entry.get()
+        sagesse = self.add_sagesse_entry.get()
+        charisme = self.add_charisme_entry.get()
 
         # Vérifier si tous les champs sont remplis
-        if name and firstname and stats:
-            c.execute("INSERT INTO characters (name, firstname, force, agility, intelligence) VALUES (?, ?, ?, ?, ?)",
-                      (name, firstname, 0, 0, 0))  # Les statistiques commencent à 0 par défaut
+        if firstname and force and agilite and intelligence:
+            c.execute(
+                "INSERT INTO characters (firstname, force, agilite, intelligence, dexterite, constitution, sagesse, charisme) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (firstname, force, agilite, intelligence, dexterite, constitution, sagesse, charisme))  # Les statistiques commencent à 0 par défaut
             conn.commit()
             messagebox.showinfo("Ajouter Personnage", "Personnage ajouté avec succès.")
             self.load_characters()  # Recharger la liste des personnages après l'ajout
@@ -126,10 +161,12 @@ class CharactersPage:
 
     def load_characters(self):
         self.list_characters_listbox.delete(0, tk.END)
-        c.execute("SELECT name, firstname FROM characters")
+        c.execute(
+            "SELECT firstname, force, agilite, intelligence, dexterite, constitution, sagesse, charisme FROM characters")
         characters = c.fetchall()
         for character in characters:
-            self.list_characters_listbox.insert(tk.END, f"{character[0]} {character[1]}")
+            stats = f"Force: {character[1]} Agilité: {character[2]} Intelligence: {character[3]} Dextérité: {character[4]} Constitution: {character[5]} Sagesse: {character[6]} Charisme: {character[7]}"
+            self.list_characters_listbox.insert(tk.END, f"{character[0]} - {stats}")
 
     def modify_character(self):
         selected_character = self.modify_characters_listbox.get(tk.ACTIVE)
@@ -137,21 +174,23 @@ class CharactersPage:
         selected_stat = self.stats_combobox.get()
 
         if selected_character and new_stat_value and selected_stat:
-            character_name, character_firstname = selected_character.split()
+            character_firstname = selected_character.split()
             # Modifier la statistique sélectionnée pour le personnage sélectionné
-            c.execute(f"UPDATE characters SET {selected_stat.lower()}=? WHERE name=? AND firstname=?",
-                      (new_stat_value, character_name, character_firstname))
+            c.execute(f"UPDATE characters SET {selected_stat.lower()}=? WHERE firstname=?",
+                      (new_stat_value, character_firstname[0]))
             conn.commit()
             messagebox.showinfo("Modifier Personnage", f"{selected_stat} du personnage modifiée avec succès.")
         else:
-            messagebox.showwarning("Modifier Personnage", "Veuillez sélectionner un personnage, une statistique et entrer une nouvelle valeur de statistique.")
+            messagebox.showwarning("Modifier Personnage",
+                                   "Veuillez sélectionner un personnage, une statistique et entrer une nouvelle valeur de statistique.")
 
     def load_characters_for_modification(self):
         self.modify_characters_listbox.delete(0, tk.END)
-        c.execute("SELECT name, firstname FROM characters")
+        c.execute("SELECT firstname FROM characters")
         characters = c.fetchall()
         for character in characters:
-            self.modify_characters_listbox.insert(tk.END, f"{character[0]} {character[1]}")
+            self.modify_characters_listbox.insert(tk.END, character[0])
+
 
 class ScenariosPage:
     def __init__(self, master):
