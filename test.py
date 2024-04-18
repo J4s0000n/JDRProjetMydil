@@ -133,6 +133,23 @@ class CharactersPage:
         self.list_characters_frame = tk.Frame(self.list_characters_tab)
         self.list_characters_frame.pack(padx=10, pady=10)
 
+        # Onglet "Inventaire du Personnage"
+        self.character_inventory_tab = tk.Frame(self.tabControl)
+        self.tabControl.add(self.character_inventory_tab, text="Inventaire du Personnage")
+        self.character_inventory_frame = tk.Frame(self.character_inventory_tab)
+        self.character_inventory_frame.pack(padx=10, pady=10)
+
+        self.character_inventory_label = tk.Label(self.character_inventory_frame, text="Inventaire du Personnage:")
+        self.character_inventory_label.pack()
+
+        self.character_inventory_listbox = tk.Listbox(self.character_inventory_frame,
+                                                      width=100)  # Ajustez la largeur selon vos besoins
+        self.character_inventory_listbox.pack(fill=tk.BOTH,
+                                              expand=True)  # Remplissage et extension pour occuper tout l'espace disponible
+
+        # Charger l'inventaire du premier personnage par défaut
+        self.load_inventory_for_selected_character()
+
         # Liste des personnages avec une taille de fenêtre plus grande
         self.list_characters_label = tk.Label(self.list_characters_frame, text="Liste des Personnages:")
         self.list_characters_label.pack()
@@ -147,6 +164,22 @@ class CharactersPage:
         # Charger les personnages
         self.load_characters()
         self.load_characters_for_modification()
+
+    def load_inventory_for_selected_character(self):
+        selected_character = self.modify_characters_listbox.get(tk.ACTIVE)
+        if selected_character:
+            character_firstname = selected_character.split()[0]
+            # Récupérer l'inventaire du personnage à partir de la base de données
+            c.execute(
+                "SELECT item_name, quantity FROM inventory WHERE character_id IN (SELECT id FROM characters WHERE firstname=?)",
+                (character_firstname,))
+            inventory = c.fetchall()
+            self.character_inventory_listbox.delete(0, tk.END)
+            for item in inventory:
+                self.character_inventory_listbox.insert(tk.END, f"{item[0]} - Quantité: {item[1]}")
+        else:
+            messagebox.showwarning("Charger Inventaire",
+                                   "Veuillez sélectionner un personnage pour afficher son inventaire.")
 
     def add_character(self):
         firstname = self.add_firstname_entry.get()
